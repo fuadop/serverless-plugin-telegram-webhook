@@ -1,6 +1,7 @@
 import Serverless, { Options } from "serverless";
 import * as https from "node:https";
 import { RequestOptions } from "node:http";
+import { join } from "node:path";
 import { Context, Config, TelegramWebhook, AWSStackOutput } from "./types";
 
 class PluginTelegramWebhook {
@@ -84,7 +85,7 @@ class PluginTelegramWebhook {
 		if (!endpoint) return;
 
 		// full webhook url
-		const url = new URL(path, endpoint).href;
+		const url = new URL(join(this.sls.service.provider.stage, path), endpoint).href;
 
 		// set webhook on telegram db
 		const res = await this.apiCall("setWebhook", { url });
@@ -121,7 +122,7 @@ class PluginTelegramWebhook {
 		);
 		if (!serviceEndpointOutput) {
 			throw new Error(
-				`[] Stack: ${aws.naming.getStackName()} does not have a service endpoint attached (i.e no lambda is triggered by http/httpApi)`
+				`[serverless-plugin-telegram-webhook] Stack: ${aws.naming.getStackName()} does not have a service endpoint attached (i.e no lambda is triggered by http/httpApi)`
 			);
 		}
 
